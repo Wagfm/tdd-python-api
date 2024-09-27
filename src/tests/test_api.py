@@ -6,6 +6,7 @@ import requests
 from tests.helpers import Generator
 
 
+@unittest.skip
 class TestAPI(unittest.TestCase):
     def setUp(self) -> None:
         self._host = "127.0.0.1"

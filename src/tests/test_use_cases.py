@@ -8,10 +8,10 @@ from tests.helpers import Generator
 
 
 class TestUseCases(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
 
     def test_create_valid_user(self) -> None:
