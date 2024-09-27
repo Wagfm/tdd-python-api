@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+psycopg = {extras = ["pool", "binary"], version = "*"}
+fastapi = "*"
+pydantic = "*"
+flask = "*"
+uvicorn = "*"
+requests = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
+python_full_version = "3.12.5"
+
+[scripts]
+test = "python -B -m unittest discover src"
+start = "python -B src/main.py"
