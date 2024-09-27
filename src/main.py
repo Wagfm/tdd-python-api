@@ -2,12 +2,15 @@ import json
 
 import uvicorn
 from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import Request
 from fastapi import Response
 from fastapi import status
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
+from starlette.responses import PlainTextResponse
 
 from create_user import CreateUser
-from custom_exceptions import ConflictException, NotFoundException
+from custom_exceptions import ConflictException, NotFoundException, MissingFieldException, WrongDataTypeException
 from delete_user import DeleteUser
 from get_user import GetUser
 
@@ -18,6 +21,16 @@ class User(BaseModel):
 
 
 app = FastAPI(debug=True)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    exception_type = repr(exc.errors()[0]["type"])
+    if "_type" in exception_type or "missing" in exception_type:
+        return PlainTextResponse(str(exc), status_code=status.HTTP_400_BAD_REQUEST)
+    return PlainTextResponse(str(exc), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
 router = APIRouter()
 
 
@@ -30,6 +43,10 @@ def create_user_route(user: User) -> Response:
         content = json.dumps(created_user)
         headers["Location"] = f"/api/users/{created_user['id']}"
         response = Response(content, status.HTTP_201_CREATED, headers)
+    except (MissingFieldException, WrongDataTypeException) as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e), headers)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(e), headers)
     except ConflictException as e:
         raise HTTPException(status.HTTP_409_CONFLICT, str(e), headers)
     except Exception as e:

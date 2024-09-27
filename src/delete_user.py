@@ -38,4 +38,3 @@ class DeleteUser:
                 connection.close()
         if deleted_user is None:
             raise NotFoundException("User not found")
-        return deleted_user
